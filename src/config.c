@@ -112,6 +112,8 @@ static int ini_handle(void *out, const char *section, const char *name,
       config->mapping = STR(value);
     } else if (strcmp(name, "mouse_acceleration") == 0) {
       config->mouse_acceleration = INT(value);
+    } else if (strcmp(name, "absolute_mouse") == 0) {
+      config->absolute_mouse = BOOL(value);
     } else if (strcmp(name, "enable_ref_frame_invalidation") == 0) {
       config->enable_ref_frame_invalidation = BOOL(value);
     } else if (strcmp(name, "enable_remote_stream_optimization") == 0) {
@@ -167,6 +169,7 @@ void config_save(const char* filename, PCONFIGURATION config) {
   write_config_bool(fd, "save_debug_log", config->save_debug_log);
 
   write_config_int(fd, "mouse_acceleration", config->mouse_acceleration);
+  write_config_bool(fd, "absolute_mouse", config->absolute_mouse);
   write_config_bool(fd, "enable_ref_frame_invalidation", config->enable_ref_frame_invalidation);
   write_config_int(fd, "enable_remote_stream_optimization", config->stream.streamingRemotely);
   write_config_bool(fd, "enable_vita_vblank_wait", config->enable_vita_vblank_wait);
@@ -236,6 +239,7 @@ void config_parse(int argc, char* argv[], PCONFIGURATION config) {
   config->special_keys.size = 150;
 
   config->mouse_acceleration = 150;
+  config->absolute_mouse = false;
   config->enable_ref_frame_invalidation = false;
   config->enable_vita_vblank_wait = false;
 

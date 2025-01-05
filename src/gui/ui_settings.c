@@ -412,6 +412,7 @@ enum {
   SETTINGS_BACK_DEADZONE,
   SETTINGS_SPECIAL_KEYS,
   SETTINGS_MOUSE_ACCEL,
+  SETTINGS_ABSOLUTE_MOUSE,
 };
 
 enum {
@@ -433,6 +434,7 @@ enum {
   SETTINGS_VIEW_BACK_DEADZONE,
   SETTINGS_VIEW_SPECIAL_KEYS,
   SETTINGS_VIEW_MOUSE_ACCEL,
+  SETTINGS_VIEW_ABSOLUTE_MOUSE,
 
   SETTINGS_VIEW_MAX_COUNT,
 };
@@ -664,6 +666,13 @@ static int settings_loop(int id, void *context, const input_data *input) {
 
       did_change = 1;
       break;
+    case SETTINGS_ABSOLUTE_MOUSE:
+      if ((input->buttons & config.btn_confirm) == 0 || input->buttons & SCE_CTRL_HOLD) {
+        break;
+      }
+      did_change = 1;
+      config.absolute_mouse = !config.absolute_mouse;
+      break;
 
   }
 
@@ -729,6 +738,9 @@ static int settings_loop(int id, void *context, const input_data *input) {
 
   sprintf(current, "%d", config.mouse_acceleration);
   MENU_REPLACE(SETTINGS_VIEW_MOUSE_ACCEL, current);
+
+  sprintf(current, "%s", config.absolute_mouse ? "yes" : "no");
+  MENU_REPLACE(SETTINGS_VIEW_ABSOLUTE_MOUSE, current);
   return 0;
 }
 
@@ -777,6 +789,7 @@ int ui_settings_menu() {
 
   MENU_CATEGORY("Input");
   MENU_ENTRY(SETTINGS_MOUSE_ACCEL, SETTINGS_VIEW_MOUSE_ACCEL, "Mouse acceleration", ICON_LEFT_RIGHT_ARROWS);
+  MENU_ENTRY(SETTINGS_ABSOLUTE_MOUSE, SETTINGS_VIEW_ABSOLUTE_MOUSE, "Absolute mouse", "");
   MENU_ENTRY(SETTINGS_ENABLE_MAPPING, SETTINGS_VIEW_ENABLE_MAPPING, "Enable mapping file", "");
   MENU_MESSAGE("Located at ux0:data/moonlight/mappings/vita.conf");
   MENU_MESSAGE("Example in github repo.");
