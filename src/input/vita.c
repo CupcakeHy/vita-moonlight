@@ -79,6 +79,7 @@ typedef struct TouchData {
 #define lerp(value, from_max, to_max) ((((value*10) * (to_max*10))/(from_max*10))/10)
 
 double mouse_multiplier;
+bool absolute_mouse;
 
 #define MOUSE_ACTION_DELAY 100000 // 100ms
 
@@ -114,6 +115,12 @@ inline void move_mouse(TouchData old, TouchData cur) {
   int y = lround(delta_y * mouse_multiplier);
 
   LiSendMouseMoveEvent(x, y);
+}
+
+inline void move_mouse_absolute(TouchData touch) {
+  int x = touch.points[0].x;
+  int y = touch.points[0].y;
+  LiSendMousePositionEvent(x, y, WIDTH, HEIGHT);
 }
 
 inline void move_wheel(TouchData old, TouchData cur) {
@@ -399,7 +406,11 @@ static inline void vitainput_process(void) {
   switch (front_state) {
     case NO_TOUCH_ACTION:
       if (touch.finger > 0) {
-        front_state = ON_SCREEN_TOUCH;
+        if (absolute_mouse) {
+          front_state = MOVE_MOUSE_ABSOLUTE;
+        } else {
+          front_state = ON_SCREEN_TOUCH;
+        }
         finger_count = touch.finger;
         sceRtcTickAddMicroseconds(&until, &current, MOUSE_ACTION_DELAY);
       }
@@ -420,6 +431,15 @@ static inline void vitainput_process(void) {
         }
       } else {
         front_state = SWIPE_START;
+      }
+      break;
+    case MOVE_MOUSE_ABSOLUTE:
+      if (touch.finger > 0) {
+        move_mouse_absolute(touch);
+        mouse_click(finger_count, true);
+      } else {
+        mouse_click(finger_count, false);
+        front_state = NO_TOUCH_ACTION;
       }
       break;
     case SCREEN_TAP:
@@ -577,6 +597,7 @@ void vitainput_config(CONFIGURATION config) {
   FRONT_SECTIONS[3].right.y = HEIGHT - config.special_keys.offset;
 
   mouse_multiplier = 1 + (0.01 * config.mouse_acceleration);
+  absolute_mouse = config.mouse_acceleration;
 }
 
 void vitainput_start(void) {
