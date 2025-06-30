@@ -80,6 +80,8 @@ typedef struct TouchData {
 
 double mouse_multiplier;
 bool absolute_mouse;
+int host_screen_x_offset;
+int host_screen_y_offset;
 
 #define MOUSE_ACTION_DELAY 100000 // 100ms
 
@@ -120,7 +122,7 @@ inline void move_mouse(TouchData old, TouchData cur) {
 inline void move_mouse_absolute(TouchData touch) {
   int x = touch.points[0].x;
   int y = touch.points[0].y;
-  LiSendMousePositionEvent(x, y, WIDTH, HEIGHT);
+  LiSendMousePositionEvent(x, y, WIDTH + host_screen_x_offset, HEIGHT + host_screen_y_offset);
 }
 
 inline void move_wheel(TouchData old, TouchData cur) {
@@ -597,7 +599,9 @@ void vitainput_config(CONFIGURATION config) {
   FRONT_SECTIONS[3].right.y = HEIGHT - config.special_keys.offset;
 
   mouse_multiplier = 1 + (0.01 * config.mouse_acceleration);
-  absolute_mouse = config.mouse_acceleration;
+  absolute_mouse = config.absolute_mouse;
+  host_screen_x_offset = config.host_screen_x_offset;
+  host_screen_y_offset = config.host_screen_y_offset;
 }
 
 void vitainput_start(void) {
