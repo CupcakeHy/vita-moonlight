@@ -600,8 +600,6 @@ void vitainput_config(CONFIGURATION config) {
 
   mouse_multiplier = 1 + (0.01 * config.mouse_acceleration);
   absolute_mouse = config.absolute_mouse;
-  host_screen_x_offset = config.host_screen_x_offset;
-  host_screen_y_offset = config.host_screen_y_offset;
 }
 
 void vitainput_start(void) {
